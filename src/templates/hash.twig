@@ -1,0 +1,101 @@
+{% extends "layout/base.twig" %}
+
+{% from "macro/common.twig" import primary_button, secondary_button, input_text, textarea %}
+
+
+{% block body %}
+    {% include 'include/error.twig' %}
+
+    <form method="post">
+{#        <h1 class="mb-4 text-3xl font-bold leading-tight">Hash</h1>#}
+
+        <div class="mb-4 flex gap-2">
+            {{ textarea("content", content, attrs={"rows": "1", "class": "w-full grow-1", "autofocus": true}) }}
+            {{ primary_button("Calculate", size="xl", icon="hash", attrs={ "type": "submit" }) }}
+        </div>
+    </form>
+
+    <table class="w-full">
+        <thead>
+        <tr class="bg-gray-100">
+            <th class="p-4">Method</th>
+            <th class="p-4">Result</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td class="py-4 border-b"><abbr title="Message-digest algorithm">MD5</abbr></td>
+            <td class="py-4 border-b">{{ input_text("", result.md5, attrs={"class":"w-full", "readonly": true}) }}</td>
+        </tr>
+        <tr>
+            <td class="py-4 border-b"><abbr title="Cyclic redundancy check">CRC</abbr></td>
+            <td class="py-4 border-b">
+                <table class="w-full">
+                    <colgroup>
+                        <col class="w-24" />
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th class="py-2"></th>
+                        <th class="py-2">Integer</th>
+                        <th class="py-2">Hex</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="py-2">CRC16(arc)</td>
+                        <td class="py-2 pr-2">{{ input_text("", result.crc16.int, attrs={"class":"w-full", "readonly": true}) }}</td>
+                        <td class="py-2 pl-2">{{ input_text("", result.crc16.hex, attrs={"class":"w-full", "readonly": true}) }}</td>
+                    </tr>
+                    <tr>
+                        <td class="py-2">CRC32(ISO)</td>
+                        <td class="py-2 pr-2">{{ input_text("", result.crc32.int, attrs={"class":"w-full", "readonly": true}) }}</td>
+                        <td class="py-2 pl-2">{{ input_text("", result.crc32.hex, attrs={"class":"w-full", "readonly": true}) }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td class="py-4 border-b"><abbr title="Secure hash algorithms">SHA</abbr></td>
+            <td class="py-4 border-b">
+                <table class="w-full">
+                    <colgroup>
+                        <col class="w-24" />
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th class="py-2"></th>
+                        <th class="py-2">Hex</th>
+                        <th class="py-2">Base64</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="py-2">SHA1</td>
+                        <td class="py-2 pr-2">{{ input_text("", result.sha1.hex, attrs={"class":"w-full", "readonly": true}) }}</td>
+                        <td class="py-2 pl-2">{{ input_text("", result.sha1.b64, attrs={"class":"w-full", "readonly": true}) }}</td>
+                    </tr>
+                    <tr>
+                        <td class="py-2">SHA256</td>
+                        <td class="py-2 pr-2">{{ textarea("", result.sha256.hex, attrs={"class":"w-full", "readonly": true}) }}</td>
+                        <td class="py-2 pl-2">{{ textarea("", result.sha256.b64, attrs={"class":"w-full", "readonly": true}) }}</td>
+                    </tr>
+                    <tr>
+                        <td class="py-2">SHA384</td>
+                        <td class="py-2 pr-2">{{ textarea("", result.sha384.hex, attrs={"class":"w-full", "readonly": true}) }}</td>
+                        <td class="py-2 pl-2">{{ textarea("", result.sha384.b64, attrs={"class":"w-full", "readonly": true}) }}</td>
+                    </tr>
+                    <tr>
+                        <td class="py-2">SHA512</td>
+                        <td class="py-2 pr-2">{{ textarea("", result.sha512.hex, attrs={"rows": 3, "class":"w-full", "readonly": true}) }}</td>
+                        <td class="py-2 pl-2">{{ textarea("", result.sha512.b64, attrs={"rows": 3, "class":"w-full", "readonly": true}) }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+{% endblock %}

@@ -1,0 +1,43 @@
+[package]
+name = "arp-sh"
+version = "0.1.0"
+edition = "2021"
+
+
+[profile.release]
+opt-level = 'z'
+lto = true
+codegen-units = 1
+#debug = true
+
+[features]
+bundled = []
+
+
+[dependencies]
+actix-web = "4.4.1"
+minijinja = { version = "1.0.12", features = ["loader"] }
+serde = { version = "1.0.195", features = ["derive"] }
+env_logger = "0.11.0"
+log = "0.4"
+dprint-plugin-typescript = "0.88.9"
+dprint-plugin-json = "0.19.1"
+dprint-plugin-markdown = "0.16.3"
+anyhow = "1.0.79"
+actix-web-lab = "0.20.1"
+quickjs-rs = "0.5.2"
+similar = "2.4.0"
+nginx-config = "0.13.2"
+md-5 = "0.10.6"
+sha1 = "0.10.6"
+sha2 = "0.10.8"
+sha3 = "0.10.8"
+crc = "3.0.1"
+base64 = "0.21.7"
+rust-embed = "8.2.0"
+mime_guess = "2.0.4"
+minijinja-embed = "1.0.12"
+
+[build-dependencies]
+minijinja-embed = "1.0.12"
+
