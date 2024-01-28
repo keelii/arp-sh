@@ -68,6 +68,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(state)
             .app_data(web::FormConfig::default().limit(1024 * 1024 * 10))
             .service(statics)
+            .service(web::redirect("/","/format"))
             .service(get_format)
             .service(post_format)
             .service(get_diff)
