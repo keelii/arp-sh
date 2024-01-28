@@ -10,9 +10,6 @@ lto = true
 codegen-units = 1
 #debug = true
 
-[features]
-bundled = []
-
 
 [dependencies]
 actix-web = "4.4.1"
@@ -36,8 +33,3 @@ crc = "3.0.1"
 base64 = "0.21.7"
 rust-embed = "8.2.0"
 mime_guess = "2.0.4"
-minijinja-embed = "1.0.12"
-
-[build-dependencies]
-minijinja-embed = "1.0.12"
-

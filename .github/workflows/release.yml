@@ -44,6 +44,6 @@ jobs:
 #          zip: windows
           # (optional) Build with the given set of features if any.
 #          features: ${{ matrix.features || '' }}
-          features: bundled
+#          features: bundled
           # (required) GitHub token for uploading assets to GitHub Releases.
           token: ${{ secrets.GITHUB_TOKEN }}

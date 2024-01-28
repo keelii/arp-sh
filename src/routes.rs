@@ -1,5 +1,5 @@
 use crate::diff::{differ_by_type, DiffFormData, DiffType};
-use crate::embed::get_embed_file;
+use crate::embed::get_embed_static_file;
 use crate::format::{format_text_by_ext, ExtType, FormatFormData};
 use crate::hash::{hash_bytes, HashFormData};
 use crate::utils::html_checkbox_to_bool;
@@ -9,7 +9,7 @@ use minijinja::context;
 
 #[get("/static/{_:.*}")]
 async fn statics(path: web::Path<String>) -> impl Responder {
-    let content = get_embed_file(path.as_str());
+    let content = get_embed_static_file(path.as_str());
     HttpResponse::Ok()
         .content_type(
             mime_guess::from_path(path.as_ref())

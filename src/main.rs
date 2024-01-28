@@ -6,7 +6,7 @@ mod routes;
 mod state;
 mod utils;
 
-use crate::embed::get_embed_file;
+use crate::embed::{get_embed_static_file, get_embed_template_file};
 use crate::routes::{get_diff, get_format, get_hash, post_diff, post_format, post_hash, statics};
 use crate::state::AppState;
 use actix_web::web;
@@ -18,8 +18,8 @@ use std::path::Path;
 use std::sync::Arc;
 
 fn init_js_rt() -> Context {
-    let js_beautify = get_embed_file("js-beautify.js");
-    let diff2html = get_embed_file("diff2html.js");
+    let js_beautify = get_embed_static_file("js-beautify.js");
+    let diff2html = get_embed_static_file("diff2html.js");
     let source = format!(
         "{}\n{}",
         String::from_utf8_lossy(&js_beautify),
@@ -36,15 +36,11 @@ fn init_js_rt() -> Context {
 fn init_template<'source>(dir: &Path) -> Environment<'source> {
     let mut env: Environment = Environment::new();
 
-    #[cfg(feature = "bundled")]
-    {
-        minijinja_embed::load_templates!(&mut env);
-    }
-
-    #[cfg(not(feature = "bundled"))]
-    {
-        env.set_loader(minijinja::path_loader(dir));
-    }
+    env.set_loader(|name| {
+        // info!("load template: {}", name);
+        let result = get_embed_template_file(name);
+        Ok(Some(String::from_utf8_lossy(&result).into()))
+    });
 
     return env;
 }

@@ -384,7 +384,6 @@ dependencies = [
  "md-5",
  "mime_guess",
  "minijinja",
- "minijinja-embed",
  "nginx-config",
  "quickjs-rs",
  "rust-embed",
@@ -1260,12 +1259,6 @@ dependencies = [
  "self_cell",
  "serde",
 ]
-
-[[package]]
-name = "minijinja-embed"
-version = "1.0.12"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5da47ed3525b56e2fb5c8c5dc6bece96ca0beb8bb9599ec65dfddaa3353aa18c"
 
 [[package]]
 name = "miniz_oxide"
