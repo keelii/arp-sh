@@ -32,6 +32,7 @@
     "ok":        { "type": "fill",   "viewbox": "20", "path": "M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" },
     "clipboard": { "type": "stroke", "viewbox": "24", "path": "M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" },
     "hash":      { "type": "stroke", "viewbox": "24", "path": "M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5" },
+    "upload":    { "type": "stroke", "viewbox": "24", "path": "M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15" },
 } %}
 
 
@@ -49,7 +50,7 @@
     </button>
 {% endmacro %}
 
-{% macro secondary_button(label, size="md", icon="", attrs={}) %}
+{% macro secondary_button(label, size="md", icon="", attrs={}, child="") %}
     {% set classes = {
         'xs': 'rounded bg-white text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50',
         'sm': 'rounded bg-white text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50',
@@ -59,7 +60,7 @@
     } %}
     {% set icon_classes = "inline-flex items-center gap-x-1.5 " if icon %}
     <button {% if not attrs["type"] %} type="button"{% endif %} {{ map_attrs_with_class(icon_classes + " " + space_classes[size] + " " + classes[size], attrs) }}>
-        {{ svg_tag(icon) if icon }}{{ label }}
+        {{ svg_tag(icon) if icon }}{{ label }}{{ child if icon }}
     </button>
 {% endmacro %}
 
@@ -130,11 +131,14 @@
     </div>
 {% endmacro %}
 
+{% macro input_file(id, attrs={}) %}
+    <input type="file" name="{{ id }}" id="{{ id }}" {{ map_attrs_with_class("", attrs) }} />
+{% endmacro %}
 {% macro input_text(id, value="", attrs={}) %}
     <input type="text" value="{{ value }}" name="{{ id }}" id="{{ id }}" {{ map_attrs_with_class("rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6", attrs) }} />
 {% endmacro %}
 {% macro textarea(id, value="", attrs={}) %}
-    <textarea name="{{ id }}" id="{{ id }}" {{ map_attrs_with_class("font-mono block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6", attrs) }}>{{ value }}</textarea>
+    <textarea name="{{ id }}" id="{{ id }}" {{ map_attrs_with_class("font-mono block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6", attrs) }}>{{ value | escape }}</textarea>
 {% endmacro %}
 
 {% macro checkbox_field(id, label, checked) %}

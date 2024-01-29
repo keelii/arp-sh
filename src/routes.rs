@@ -1,10 +1,13 @@
+use std::collections::HashMap;
+use actix_multipart::Multipart;
 use crate::diff::{differ_by_type, DiffFormData, DiffType};
 use crate::embed::get_embed_static_file;
 use crate::format::{format_text_by_ext, ExtType, FormatFormData};
-use crate::hash::{hash_bytes, HashFormData};
+use crate::hash::{hash_bytes};
 use crate::utils::html_checkbox_to_bool;
 use crate::AppState;
 use actix_web::{get, post, web, HttpResponse, Responder};
+use actix_web_lab::__reexports::futures_util::StreamExt;
 use minijinja::context;
 
 #[get("/static/{_:.*}")]
@@ -30,20 +33,61 @@ async fn get_hash(app: web::Data<AppState>) -> impl Responder {
         },
     )
 }
+
+struct MultipartFormField {
+    name: String,
+    bytes: Vec<u8>,
+}
+
+async fn parse_multipart_form(mut form: Multipart) -> HashMap<String, MultipartFormField> {
+    let mut map = HashMap::new();
+
+    while let Some(item) = form.next().await {
+        let mut field = item.unwrap();
+        let mut bufs = Vec::new();
+        let name = field.name().to_string();
+
+        while let Some(chunk) = field.next().await {
+            let bytes = &chunk.unwrap();
+            bufs.append(&mut bytes.to_vec());
+        }
+
+        map.insert(name.to_string(), MultipartFormField {
+            name,
+            bytes: bufs,
+        });
+    };
+
+    map
+}
+
 #[post("/hash")]
 async fn post_hash(
-    form: web::Form<HashFormData>,
+    form: Multipart,
     app: web::Data<AppState>,
 ) -> impl Responder {
-    let result = hash_bytes(form.content.as_bytes());
-    app.render(
-        "hash.twig",
-        context! {
-            nav_name => "hash",
-            content => form.content.clone(),
-            result => result
-        },
-    )
+    let map = parse_multipart_form(form).await;
+    let files = map.get("files").unwrap();
+    let content = map.get("content").unwrap();
+
+    if files.bytes.len() > 0 {
+        app.render(
+            "hash.twig",
+            context! {
+                nav_name => "hash",
+                result => hash_bytes(&files.bytes),
+            },
+        )
+    } else {
+        app.render(
+            "hash.twig",
+            context! {
+                nav_name => "hash",
+                content => String::from_utf8_lossy(content.bytes.as_slice()).to_string(),
+                result => hash_bytes(&content.bytes),
+            },
+        )
+    }
 }
 #[get("/diff")]
 async fn get_diff(app: web::Data<AppState>) -> impl Responder {
@@ -106,6 +150,7 @@ async fn get_format(app: web::Data<AppState>) -> impl Responder {
 async fn post_format(form: web::Form<FormatFormData>, app: web::Data<AppState>) -> impl Responder {
     let ext_type = ExtType::from_str(&form.ext);
     let indent2 = html_checkbox_to_bool(&form.indent2);
+    // let size = form.content.chars().count();
 
     let result = match ext_type {
         ExtType::JavaScript => app.format_js(&form.content, &format!("{}", indent2).to_string()),

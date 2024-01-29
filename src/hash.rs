@@ -10,7 +10,9 @@ use sha3::{Sha3_384, Sha3_512};
 #[derive(Debug, Deserialize)]
 pub struct HashFormData {
     pub content: String,
+    // pub file: Multipart,
 }
+
 
 #[allow(dead_code)]
 #[derive(Debug, Serialize)]
