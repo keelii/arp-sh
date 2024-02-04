@@ -9,6 +9,7 @@ use crate::AppState;
 use actix_web::{get, post, web, HttpResponse, Responder};
 use actix_web_lab::__reexports::futures_util::StreamExt;
 use minijinja::context;
+use crate::consts::SizeUnit;
 
 #[get("/static/{_:.*}")]
 async fn statics(path: web::Path<String>) -> impl Responder {
@@ -34,6 +35,7 @@ async fn get_hash(app: web::Data<AppState>) -> impl Responder {
     )
 }
 
+#[allow(dead_code)]
 struct MultipartFormField {
     name: String,
     bytes: Vec<u8>,
@@ -125,6 +127,7 @@ async fn post_diff(
                 diff_type => form.diff_type.clone(),
                 left => form.left.clone(),
                 right => form.right.clone(),
+                unified => unified,
                 result => html,
             },
         ),
@@ -150,13 +153,21 @@ async fn get_format(app: web::Data<AppState>) -> impl Responder {
 async fn post_format(form: web::Form<FormatFormData>, app: web::Data<AppState>) -> impl Responder {
     let ext_type = ExtType::from_str(&form.ext);
     let indent2 = html_checkbox_to_bool(&form.indent2);
-    // let size = form.content.chars().count();
+    let size = form.content.len();
 
     let result = match ext_type {
         ExtType::JavaScript => app.format_js(&form.content, &format!("{}", indent2).to_string()),
         ExtType::Html => app.format_html(&form.content, &format!("{}", indent2).to_string()),
         ExtType::Css => app.format_css(&form.content, &format!("{}", indent2).to_string()),
-        ExtType::TypeScript | ExtType::Json | ExtType::Markdown | ExtType::Nginx => {
+        ExtType::TypeScript => {
+            if size > SizeUnit::MB.to_bytes(1) {
+                // Err(format!("size {}, too large > 1MB to format", SizeUnit::MB.from_bytes(size)))
+                app.format_js(&form.content, &format!("{}", indent2).to_string())
+            } else {
+                format_text_by_ext(ext_type, &form.content, indent2)
+            }
+        },
+        ExtType::Json | ExtType::Markdown | ExtType::Nginx => {
             format_text_by_ext(ext_type, &form.content, indent2)
         }
     };

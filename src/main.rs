@@ -5,6 +5,7 @@ mod hash;
 mod routes;
 mod state;
 mod utils;
+mod consts;
 
 use crate::embed::{get_embed_static_file, get_embed_template_file};
 use crate::routes::{get_diff, get_format, get_hash, post_diff, post_format, post_hash, statics};
@@ -27,6 +28,13 @@ fn init_js_rt() -> Context {
     );
 
     let context = Context::new().unwrap();
+
+    // let test = "async function test() { Promise.resolve(1); }; await test()";
+    // let ret = context.eval(&test).unwrap();
+    // println!("=====");
+    // println!("test js runtime: {:?}", ret);
+    // println!("=====");
+
     context.eval(&source).unwrap();
     info!("init js runtime: {}bytes", source.len());
     context
