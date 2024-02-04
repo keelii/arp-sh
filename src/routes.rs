@@ -155,6 +155,19 @@ async fn post_format(form: web::Form<FormatFormData>, app: web::Data<AppState>) 
     let indent2 = html_checkbox_to_bool(&form.indent2);
     let size = form.content.len();
 
+    if size > SizeUnit::MB.to_bytes(2) {
+        return app.render(
+            "format.twig",
+            context! {
+                nav_name => "format",
+                ext => form.ext.clone(),
+                indent2 => indent2,
+                content => form.content.clone(),
+                error => format!("content size {}, too large > 2MB to format", SizeUnit::MB.from_bytes(size)),
+            },
+        );
+    }
+
     let result = match ext_type {
         ExtType::JavaScript => app.format_js(&form.content, &format!("{}", indent2).to_string()),
         ExtType::Html => app.format_html(&form.content, &format!("{}", indent2).to_string()),
