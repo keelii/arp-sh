@@ -18,6 +18,7 @@ use quickjs_rs::Context;
 use std::path::Path;
 use std::sync::Arc;
 
+
 fn init_js_rt() -> Context {
     let js_beautify = get_embed_static_file("js-beautify.js");
     let diff2html = get_embed_static_file("diff2html.js");

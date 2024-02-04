@@ -22,6 +22,8 @@
                 this.elements = selector
             } else if (selector instanceof HTMLElement) {
                 this.elements = [selector]
+            } else if (selector instanceof HTMLCollection) {
+                this.elements = selector
             } else {
                 throw new Error('invalid selector type')
             }
@@ -47,8 +49,10 @@
         }
 
         parent() {
-            console.log(this.elements[0].parentElement)
             return $(this.elements[0].parentElement)
+        }
+        children() {
+            return $(this.elements[0].children)
         }
 
         remove() {
