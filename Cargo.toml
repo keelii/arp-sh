@@ -17,7 +17,7 @@ minijinja = { version = "1.0.12", features = ["loader"] }
 serde = { version = "1.0.195", features = ["derive"] }
 env_logger = "0.11.0"
 log = "0.4"
-dprint-plugin-typescript = "0.88.9"
+dprint-plugin-typescript = "0.88.10"
 dprint-plugin-json = "0.19.1"
 dprint-plugin-markdown = "0.16.3"
 anyhow = "1.0.79"
