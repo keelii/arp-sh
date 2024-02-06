@@ -6,17 +6,22 @@ mod routes;
 mod state;
 mod utils;
 mod consts;
+mod errors;
 
 use crate::embed::{get_embed_static_file, get_embed_template_file};
-use crate::routes::{get_diff, get_format, get_hash, post_diff, post_format, post_hash, statics};
+use crate::routes::{get_diff, get_format, get_hash, get_uuid, post_diff, post_format, post_hash, statics};
 use crate::state::AppState;
-use actix_web::web;
+use actix_web::{Error, HttpRequest, web};
 use actix_web::{App, HttpServer};
-use log::info;
+use log::{info, log};
 use minijinja::{Environment};
 use quickjs_rs::Context;
 use std::path::Path;
 use std::sync::Arc;
+use actix_web::error::{ErrorBadRequest, QueryPayloadError};
+use actix_web::http::StatusCode;
+use actix_web::web::Data;
+use crate::errors::ViewError;
 
 
 fn init_js_rt() -> Context {
@@ -64,29 +69,42 @@ async fn main() -> std::io::Result<()> {
     let app_host = std::env::var("APP_HOST").unwrap_or("127.0.0.1".to_string());
     let app_port = std::env::var("APP_PORT").unwrap_or("8888".to_string()).parse::<u16>().unwrap();
 
-    let jinja_env = Arc::new(init_template(Path::new("src/templates")));
+    let jinja_env_global = Arc::new(init_template(Path::new("src/templates")));
 
     HttpServer::new(move || {
+        let jinja_env = jinja_env_global.clone();
         let js_rt = init_js_rt();
+
         let state = web::Data::new(AppState {
-            jinja_env: jinja_env.clone(),
+            jinja_env,
             js_rt,
         });
 
-        App::new()
+        let app = App::new()
             .app_data(state)
             .app_data(web::FormConfig::default().limit(1024 * 1024 * 10))
+            .app_data(web::QueryConfig::default().error_handler(register_handler(jinja_env_global.clone())))
             .service(statics)
-            .service(web::redirect("/","/format"))
+            .service(web::redirect("/", "/format"))
             .service(get_format)
             .service(post_format)
             .service(get_diff)
             .service(post_diff)
             .service(get_hash)
             .service(post_hash)
+            .service(get_uuid);
+
+
+        app
     })
     .bind((app_host, app_port))
     .unwrap()
     .run()
     .await
+}
+
+fn register_handler(jinja: Arc<Environment>) -> fn(QueryPayloadError, &HttpRequest) -> Error {
+    |err: QueryPayloadError, req: &HttpRequest| {
+        ViewError::new(jinja, StatusCode::BAD_GATEWAY, 1).into()
+    }
 }

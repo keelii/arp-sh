@@ -1,3 +1,4 @@
+use std::cmp;
 use std::collections::HashMap;
 use actix_multipart::Multipart;
 use crate::diff::{differ_by_type, DiffFormData, DiffType};
@@ -9,6 +10,8 @@ use crate::AppState;
 use actix_web::{get, post, web, HttpResponse, Responder};
 use actix_web_lab::__reexports::futures_util::StreamExt;
 use minijinja::context;
+use serde::Deserialize;
+use uuid::{Uuid};
 use crate::consts::SizeUnit;
 
 #[get("/static/{_:.*}")]
@@ -206,4 +209,21 @@ async fn post_format(form: web::Form<FormatFormData>, app: web::Data<AppState>) 
             },
         ),
     }
+}
+
+#[derive(Debug, Deserialize)]
+struct UuidQuery {
+    num: Option<i32>,
+}
+
+#[get("/uuid")]
+async fn get_uuid(query: web::Query<UuidQuery>, app: web::Data<AppState>) -> impl Responder {
+    let num = cmp::max(1, cmp::min(1000, query.num.unwrap_or(5)));
+    let uuids = (0..num).map(|_| Uuid::new_v4().to_string()).collect::<Vec<String>>();
+
+    app.render("uuid.twig", context! {
+        nav_name => "uuid",
+        num => num,
+        uuids => uuids,
+    })
 }

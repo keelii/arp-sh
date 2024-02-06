@@ -1,0 +1,31 @@
+{% extends "layout/base.twig" %}
+
+{% from "macro/common.twig" import primary_button, secondary_button, input_number, input_text, input_file, textarea %}
+
+
+{% block body %}
+    {% include 'include/error.twig' %}
+
+    <div class="w-1/2 mx-auto">
+            <form method="get">
+                <div class="flex items-center gap-4 mb-8">
+                    {{ input_number("num", num, attrs={"min": "1", "max": "1000", "placeholder": "Max 1000", "class": "w-full font-mono"}) }}
+                    <span class="whitespace-nowrap">1 ~ 1000</span>
+                    {{ primary_button("Generate", size="lg", icon="ok", attrs={"type": "submit"}) }}
+                    {{ secondary_button("Download file", size="lg", icon="download", attrs={"class": "whitespace-nowrap"}) }}
+                </div>
+            </form>
+            <div class="mb-8">
+                {{ textarea("uuids", uuids | join("\n"), attrs={"class": "w-full font-mono", "rows": 5}) }}
+            </div>
+        <ul>
+            {% for uuid in uuids %}
+                <li class="flex items-center justify-between gap-x-6 py-2">
+                    {% set id = 'uuid_' ~ loop.index %}
+                    {{ input_text(id, uuid, attrs={"readonly": true, "class": "w-full font-mono"}) }}
+                    {{ primary_button("", size="lg", icon="clipboard", attrs={"onclick": "$.copy($('#"+ id +"').value())"}) }}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
