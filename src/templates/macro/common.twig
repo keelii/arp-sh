@@ -53,7 +53,7 @@
     </button>
 {% endmacro %}
 
-{% macro secondary_button(label, size="md", bold=true, icon="", attrs={}, child="") %}
+{% macro secondary(type, label, size="md", bold=true, icon="", attrs={}, child="") %}
     {%- set classes = {
         'xs': 'rounded text-xs text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50',
         'sm': 'rounded text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50',
@@ -64,9 +64,23 @@
     {%- set bold_class = "font-semibold" if bold else "" %}
     {%- set icon_classes = "inline-flex items-center gap-x-1.5" if icon else ""%}
     {%- set class_name = [icon_classes, bold_class, space_classes[size], classes[size]] | join(" ") %}
-    <button {% if not attrs["type"] %} type="button"{% endif %} {{ map_attrs_with_class(class_name, attrs) }}>
-        {{ svg_tag(icon) if icon }}{{ label }}{{ child if icon }}
-    </button>
+    {% if type == "button" %}
+        <button {% if not attrs["type"] %} type="button"{% endif %} {{ map_attrs_with_class(class_name, attrs) }}>
+            {{ svg_tag(icon) if icon }}{{ label }}{{ child if icon }}
+        </button>
+    {% endif %}
+    {% if type == "link" %}
+        <a {{ map_attrs_with_class(class_name, attrs) }}>
+            {{ svg_tag(icon) if icon }}{{ label }}{{ child if icon }}
+        </a>
+    {% endif %}
+{% endmacro %}
+
+{% macro secondary_link(label, size="md", bold=true, icon="", attrs={}, child="") %}
+    {{ secondary("link", label, size, bold, icon, attrs, child) }}
+{% endmacro %}
+{% macro secondary_button(label, size="md", bold=true, icon="", attrs={}, child="") %}
+    {{ secondary("button", label, size, bold, icon, attrs, child) }}
 {% endmacro %}
 
 {% macro button_group(id, value, options={}, size="md") %}

@@ -1,6 +1,6 @@
 {% extends "layout/base.twig" %}
 
-{% from "macro/common.twig" import primary_button, secondary_button, input_number, input_text, input_file, textarea %}
+{% from "macro/common.twig" import primary_button, secondary_button, secondary_link, input_number, input_text, input_file, textarea %}
 
 
 {% block body %}
@@ -15,10 +15,10 @@
                 </div>
             </form>
             <div class="mb-8">
-                {{ textarea("uuids", uuids | join("\n"), attrs={"class": "w-full font-mono", "rows": 5}) }}
+                {{ textarea("uuids", uuids | join("\n"), attrs={"readonly": true, "class": "w-full font-mono", "rows": 5}) }}
                 <div class="mt-4 flex gap-4">
                     {{ secondary_button("Copy All UUIDs to Clipboard", size="lg", icon="copy", attrs={"class": "justify-center grow", "onclick": "$.copy($('#uuids').value())"}) }}
-                    {{ secondary_button("Download as file", size="lg", icon="download", attrs={"class": "justify-center grow"}) }}
+                    {{ secondary_link("Download as file", size="lg", icon="download", attrs={"href": "data:text/plain;charset=utf-8," ~ uuids | join("%0A"), "download": "uuids.txt", "class": "justify-center grow"}) }}
                 </div>
             </div>
         <ul>

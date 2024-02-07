@@ -19,7 +19,6 @@ use quickjs_rs::Context;
 use std::path::Path;
 use std::sync::Arc;
 use actix_web::error::InternalError;
-use anyhow::__private::kind::TraitKind;
 use crate::rest_response::RestResponse;
 
 
