@@ -8,7 +8,7 @@
 
     <div class="w-1/2 mx-auto">
             <form method="get">
-                <div class="flex items-center gap-4 mb-8">
+                <div class="flex items-center gap-4 mb-4">
                     {{ input_number("count", count, attrs={"min": "1", "max": "500", "placeholder": "Max 500", "class": "w-full"}) }}
                     {{ primary_button("Generate", size="lg", icon="ok", attrs={"type": "submit"}) }}
                     <div id="toggle-btn">
@@ -38,17 +38,17 @@
                         </script>
                     </div>
                 </div>
-                <div class="flex items-center mb-8">
+                <div class="flex justify-between items-center mb-8 bg-blue-50 p-4 rounded-lg">
                     <div>
                         <div class="flex mb-2">
-                            <span class="w-32">{{ checkbox_field("numbers", "Numbers", true) }}</span>
-                            <span class="w-32">{{ checkbox_field("lowercase", "Lowercase", true) }}</span>
-                            <span class="w-32">{{ checkbox_field("uppercase", "Uppercase", true) }}</span>
+                            <span class="w-32 inline-flex items-center">{{ checkbox_field("numbers", "Numbers", true) }}</span>
+                            <span class="w-32 inline-flex items-center">{{ checkbox_field("lowercase", "Lowercase", true) }}</span>
+                            <span class="w-32 inline-flex items-center">{{ checkbox_field("uppercase", "Uppercase", true) }}</span>
                         </div>
                         <div class="flex">
-                            <span class="w-32">{{ checkbox_field("symbols", "Symbols", true) }}</span>
-                            <span class="w-32">{{ checkbox_field("spaces", "Spaces", false) }}</span>
-                            <span class="w-32">{{ checkbox_field("no_similar", "No Similar", false) }}</span>
+                            <span class="w-32 inline-flex items-center">{{ checkbox_field("symbols", "Symbols", true) }}</span>
+                            <span class="w-32 inline-flex items-center">{{ checkbox_field("spaces", "Spaces", false) }}</span>
+                            <span class="w-32 inline-flex items-center">{{ checkbox_field("no_similar", "No Similar", false) }}</span>
                         </div>
                     </div>
                     <div class="grow">
@@ -57,14 +57,14 @@
                     </div>
                 </div>
             </form>
-        <ul id="pass-list">
+        <ul id="pass-list" class="space-y-4">
             {% for pass in passwords %}
-                <li class="flex items-center justify-between gap-x-6 py-2">
+                <li class="flex items-center justify-between gap-x-4">
                     {% set id = 'pass_' ~ loop.index %}
                     {{ input_hidden('raw_' ~ id, pass | escape)}}
                     {{ input_text(id, pass | encrypt | escape , attrs={"readonly": true, "class": "w-full font-mono"}) }}
                     {{ input_hidden('enc_' ~ id, pass | encrypt | escape)}}
-                    {{ secondary_button("", icon="clipboard", attrs={"onclick": "$.copy($('#raw_"+ id +"').value())"}) }}
+                    {{ secondary_button("", size="lg", icon="clipboard", attrs={"onclick": "$.copy($('#raw_"+ id +"').value())"}) }}
                 </li>
             {% endfor %}
         </ul>

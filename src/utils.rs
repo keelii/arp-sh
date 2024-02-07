@@ -1,6 +1,6 @@
-pub fn html_checkbox_to_bool(value: &Option<String>, defaultValue: bool) -> bool {
+pub fn html_checkbox_to_bool(value: &Option<String>, default_value: bool) -> bool {
     match value {
         Some(_) => true,
-        None => defaultValue,
+        None => default_value,
     }
 }
