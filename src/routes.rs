@@ -1,5 +1,5 @@
 use std::cmp;
-use std::collections::HashMap;
+use std::collections::{HashMap};
 use actix_multipart::Multipart;
 use crate::diff::{differ_by_type, DiffFormData, DiffType};
 use crate::embed::get_embed_static_file;
@@ -10,6 +10,7 @@ use crate::AppState;
 use actix_web::{get, post, web, HttpResponse, Responder};
 use actix_web_lab::__reexports::futures_util::StreamExt;
 use minijinja::context;
+use minijinja::filters::bool;
 use serde::Deserialize;
 use uuid::{Uuid};
 use crate::consts::SizeUnit;
@@ -218,8 +219,15 @@ struct UuidQuery {
 
 #[get("/uuid")]
 async fn get_uuid(query: web::Query<UuidQuery>, app: web::Data<AppState>) -> impl Responder {
+    let mut uuid_map = HashMap::new();
     let num = cmp::max(1, cmp::min(1000, query.num.unwrap_or(5)));
-    let uuids = (0..num).map(|_| Uuid::new_v4().to_string()).collect::<Vec<String>>();
+    loop {
+        uuid_map.insert(Uuid::new_v4().to_string(), true);
+        if uuid_map.len() >= num as usize {
+            break;
+        }
+    }
+    let uuids = uuid_map.iter().map(|(k, _)| k).collect::<Vec<_>>();
 
     app.render("uuid.twig", context! {
         nav_name => "uuid",
