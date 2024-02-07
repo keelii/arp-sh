@@ -6,22 +6,21 @@ mod routes;
 mod state;
 mod utils;
 mod consts;
-mod errors;
+mod rest_response;
 
 use crate::embed::{get_embed_static_file, get_embed_template_file};
 use crate::routes::{get_diff, get_format, get_hash, get_uuid, post_diff, post_format, post_hash, statics};
 use crate::state::AppState;
-use actix_web::{Error, HttpRequest, web};
+use actix_web::{HttpResponse, web};
 use actix_web::{App, HttpServer};
-use log::{info, log};
+use log::{info};
 use minijinja::{Environment};
 use quickjs_rs::Context;
 use std::path::Path;
 use std::sync::Arc;
-use actix_web::error::{ErrorBadRequest, QueryPayloadError};
-use actix_web::http::StatusCode;
-use actix_web::web::Data;
-use crate::errors::ViewError;
+use actix_web::error::InternalError;
+use anyhow::__private::kind::TraitKind;
+use crate::rest_response::RestResponse;
 
 
 fn init_js_rt() -> Context {
@@ -83,7 +82,12 @@ async fn main() -> std::io::Result<()> {
         let app = App::new()
             .app_data(state)
             .app_data(web::FormConfig::default().limit(1024 * 1024 * 10))
-            .app_data(web::QueryConfig::default().error_handler(register_handler(jinja_env_global.clone())))
+            .app_data(web::QueryConfig::default().error_handler(|err, _| {
+                let msg = err.to_string();
+                InternalError::from_response(err, HttpResponse::BadRequest().json(
+                    RestResponse::query_err(msg)
+                )).into()
+            }))
             .service(statics)
             .service(web::redirect("/", "/format"))
             .service(get_format)
@@ -94,7 +98,6 @@ async fn main() -> std::io::Result<()> {
             .service(post_hash)
             .service(get_uuid);
 
-
         app
     })
     .bind((app_host, app_port))
@@ -103,8 +106,8 @@ async fn main() -> std::io::Result<()> {
     .await
 }
 
-fn register_handler(jinja: Arc<Environment>) -> fn(QueryPayloadError, &HttpRequest) -> Error {
-    |err: QueryPayloadError, req: &HttpRequest| {
-        ViewError::new(jinja, StatusCode::BAD_GATEWAY, 1).into()
-    }
-}
+// fn register_handler(jinja: Arc<Environment>) -> fn(QueryPayloadError, &HttpRequest) -> Error {
+//     |err: QueryPayloadError, req: &HttpRequest| {
+//         ViewError::new(jinja, StatusCode::BAD_GATEWAY, 1).into()
+//     }
+// }
