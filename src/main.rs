@@ -9,7 +9,7 @@ mod consts;
 mod rest_response;
 
 use crate::embed::{get_embed_static_file, get_embed_template_file};
-use crate::routes::{get_diff, get_format, get_hash, get_uuid, post_diff, post_format, post_hash, statics};
+use crate::routes::{get_diff, get_format, get_hash, get_pass, get_uuid, post_diff, post_format, post_hash, statics};
 use crate::state::AppState;
 use actix_web::{HttpResponse, web};
 use actix_web::{App, HttpServer};
@@ -44,6 +44,11 @@ fn init_js_rt() -> Context {
     context
 }
 
+fn encrypt_filter(value: String) -> String {
+    let len = value.chars().count();
+    let stars = "*".repeat(len - 4);
+    return format!("{}{}{}", &value[0..2], stars, &value[len - 2..])
+}
 #[allow(unused_variables)]
 fn init_template<'source>(dir: &Path) -> Environment<'source> {
     let mut env: Environment = Environment::new();
@@ -53,6 +58,8 @@ fn init_template<'source>(dir: &Path) -> Environment<'source> {
         let result = get_embed_template_file(name);
         Ok(Some(String::from_utf8_lossy(&result).into()))
     });
+
+    env.add_filter("encrypt", encrypt_filter);
 
     return env;
 }
@@ -78,7 +85,7 @@ async fn main() -> std::io::Result<()> {
             js_rt,
         });
 
-        let app = App::new()
+        App::new()
             .app_data(state)
             .app_data(web::FormConfig::default().limit(1024 * 1024 * 10))
             .app_data(web::QueryConfig::default().error_handler(|err, _| {
@@ -95,9 +102,8 @@ async fn main() -> std::io::Result<()> {
             .service(post_diff)
             .service(get_hash)
             .service(post_hash)
-            .service(get_uuid);
-
-        app
+            .service(get_uuid)
+            .service(get_pass)
     })
     .bind((app_host, app_port))
     .unwrap()

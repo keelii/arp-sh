@@ -9,8 +9,9 @@ use crate::utils::html_checkbox_to_bool;
 use crate::AppState;
 use actix_web::{get, post, web, HttpResponse, Responder};
 use actix_web_lab::__reexports::futures_util::StreamExt;
+use log::error;
 use minijinja::context;
-use minijinja::filters::bool;
+use passwords::PasswordGenerator;
 use serde::Deserialize;
 use uuid::{Uuid};
 use crate::consts::SizeUnit;
@@ -156,7 +157,7 @@ async fn get_format(app: web::Data<AppState>) -> impl Responder {
 #[post("/format")]
 async fn post_format(form: web::Form<FormatFormData>, app: web::Data<AppState>) -> impl Responder {
     let ext_type = ExtType::from_str(&form.ext);
-    let indent2 = html_checkbox_to_bool(&form.indent2);
+    let indent2 = html_checkbox_to_bool(&form.indent2, false);
     let size = form.content.len();
 
     if size > SizeUnit::MB.to_bytes(2) {
@@ -214,16 +215,16 @@ async fn post_format(form: web::Form<FormatFormData>, app: web::Data<AppState>) 
 
 #[derive(Debug, Deserialize)]
 struct UuidQuery {
-    num: Option<i32>,
+    count: Option<i32>,
 }
 
 #[get("/uuid")]
 async fn get_uuid(query: web::Query<UuidQuery>, app: web::Data<AppState>) -> impl Responder {
     let mut uuid_map = HashMap::new();
-    let num = cmp::max(1, cmp::min(1000, query.num.unwrap_or(5)));
+    let count = cmp::max(1, cmp::min(1000, query.count.unwrap_or(5)));
     loop {
         uuid_map.insert(Uuid::new_v4().to_string(), true);
-        if uuid_map.len() >= num as usize {
+        if uuid_map.len() >= count as usize {
             break;
         }
     }
@@ -231,7 +232,75 @@ async fn get_uuid(query: web::Query<UuidQuery>, app: web::Data<AppState>) -> imp
 
     app.render("uuid.twig", context! {
         nav_name => "uuid",
-        num => num,
+        count => count,
         uuids => uuids,
     })
+}
+
+#[derive(Debug, Deserialize)]
+struct PasswdOption {
+    count: Option<usize>,
+    length: Option<usize>,
+    numbers: Option<String>,
+    lowercase: Option<String>,
+    uppercase: Option<String>,
+    symbols: Option<String>,
+    spaces: Option<String>,
+    no_similar: Option<String>,
+}
+
+#[get("/pass")]
+async fn get_pass(query: web::Query<PasswdOption>, app: web::Data<AppState>) -> impl Responder {
+    let count = cmp::max(1, cmp::min(500, query.count.unwrap_or(5)));
+    let length = query.length.unwrap_or(6);
+    let numbers = html_checkbox_to_bool(&query.numbers, true);
+    let lowercase = html_checkbox_to_bool(&query.lowercase, true);
+    let uppercase = html_checkbox_to_bool(&query.uppercase, true);
+    let symbols = html_checkbox_to_bool(&query.symbols, true);
+    let spaces = html_checkbox_to_bool(&query.spaces, false);
+    let no_similar = html_checkbox_to_bool(&query.no_similar, false);
+
+    let pg = PasswordGenerator {
+        length,
+        numbers,
+        lowercase_letters: lowercase,
+        uppercase_letters: uppercase,
+        symbols,
+        spaces,
+        exclude_similar_characters: no_similar,
+        strict: true,
+    };
+
+    match pg.generate(count) {
+        Ok(passwords) => {
+            app.render("pass.twig", context! {
+                nav_name => "pass",
+                passwords => passwords,
+                count => count,
+                length => length,
+                numbers => numbers,
+                lowercase => lowercase,
+                uppercase => uppercase,
+                symbols => symbols,
+                spaces => spaces,
+                no_similar => no_similar,
+            })
+        },
+        Err(err) => {
+            error!("generate password error: {}", err);
+            let passwords : [String; 0] = [];
+            app.render("pass.twig", context! {
+                nav_name => "pass",
+                passwords => passwords,
+                count => count,
+                length => length,
+                numbers => numbers,
+                lowercase => lowercase,
+                uppercase => uppercase,
+                symbols => symbols,
+                spaces => spaces,
+                no_similar => no_similar
+            })
+        },
+    }
 }

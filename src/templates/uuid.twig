@@ -9,9 +9,9 @@
     <div class="w-1/2 mx-auto">
             <form method="get">
                 <div class="flex items-center gap-4 mb-8">
-                    {{ input_number("num", num, attrs={"min": "1", "max": "1000", "placeholder": "Max 1000", "class": "w-full font-mono"}) }}
+                    {{ input_number("count", count, attrs={"min": "1", "max": "1000", "placeholder": "Max 1000", "class": "w-full font-mono"}) }}
                     <span class="whitespace-nowrap">1 ~ 1000</span>
-                    {{ primary_button("Generate", size="lg", icon="Ok", attrs={"type": "submit"}) }}
+                    {{ primary_button("Generate", size="lg", icon="ok", attrs={"type": "submit"}) }}
                 </div>
             </form>
             <div class="mb-8">

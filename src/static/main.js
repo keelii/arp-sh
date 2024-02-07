@@ -25,7 +25,7 @@
             } else if (selector instanceof HTMLCollection) {
                 this.elements = selector
             } else {
-                throw new Error('invalid selector type')
+                throw new Error('invalid selector type ' + selector)
             }
         }
         each(fn) {
@@ -54,6 +54,12 @@
         children() {
             return $(this.elements[0].children)
         }
+        prev() {
+            return $(this.elements[0].previousElementSibling)
+        }
+        next() {
+            return $(this.elements[0].nextElementSibling)
+        }
 
         remove() {
             this.each(function(i, el) {
@@ -62,6 +68,9 @@
             return this
         }
 
+        hasClass(className) {
+            return this.elements[0].classList.contains(className)
+        }
         addClass(className) {
             this.each(function(i, el) {
                 el.classList.add(className)
@@ -93,6 +102,14 @@
             return this
         }
 
+        attr(key, val) {
+            if (val === undefined) {
+                return this.elements[0].getAttribute(key)
+            } else {
+                this.each(e => e.setAttribute(key, val))
+                return this
+            }
+        }
         value(val) {
             if (val === undefined) {
                 return this.elements[0].value
@@ -121,6 +138,7 @@
 
     // constructor
     var $ = function(selector) {
+        if (!selector) return null
         return new JQuery(selector)
     }
     // static method

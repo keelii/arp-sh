@@ -1,0 +1,72 @@
+{% extends "layout/base.twig" %}
+
+{% from "macro/common.twig" import primary_button, secondary_button, secondary_link, input_hidden, input_number, input_text, checkbox_field, input_range, textarea %}
+
+
+{% block body %}
+    {% include 'include/error.twig' %}
+
+    <div class="w-1/2 mx-auto">
+            <form method="get">
+                <div class="flex items-center gap-4 mb-8">
+                    {{ input_number("count", count, attrs={"min": "1", "max": "500", "placeholder": "Max 500", "class": "w-full"}) }}
+                    {{ primary_button("Generate", size="lg", icon="ok", attrs={"type": "submit"}) }}
+                    <div id="toggle-btn">
+                        {{ secondary_button("Toggle", size="lg", icon="visible", attrs={"class": "hidden", "type": "button"}) }}
+                        {{ secondary_button("Toggle", size="lg", icon="invisible", attrs={"type": "button"}) }}
+                        <script>
+                            $('#toggle-btn button').bind("click", function(e) {
+                                $(this).addClass("hidden");
+                                if ($(this).prev()) {
+                                    $(this).prev().removeClass("hidden")
+                                    showPasswords()
+                                } else {
+                                    $(this).next().removeClass("hidden")
+                                    hidePasswords()
+                                }
+                            });
+                            function showPasswords() {
+                                $("#pass-list input[type='text']").each(function(i, el) {
+                                    $(el).value($(el).prev().value())
+                                })
+                            }
+                            function hidePasswords() {
+                                $("#pass-list input[type='text']").each(function(i, el) {
+                                    $(el).value($(el).next().value())
+                                })
+                            }
+                        </script>
+                    </div>
+                </div>
+                <div class="flex items-center mb-8">
+                    <div>
+                        <div class="flex mb-2">
+                            <span class="w-32">{{ checkbox_field("numbers", "Numbers", true) }}</span>
+                            <span class="w-32">{{ checkbox_field("lowercase", "Lowercase", true) }}</span>
+                            <span class="w-32">{{ checkbox_field("uppercase", "Uppercase", true) }}</span>
+                        </div>
+                        <div class="flex">
+                            <span class="w-32">{{ checkbox_field("symbols", "Symbols", true) }}</span>
+                            <span class="w-32">{{ checkbox_field("spaces", "Spaces", false) }}</span>
+                            <span class="w-32">{{ checkbox_field("no_similar", "No Similar", false) }}</span>
+                        </div>
+                    </div>
+                    <div class="grow">
+                        <label for="length">Password Length(<strong id="len-hooks">{{ length }}</strong>)</label>
+                        {{ input_range("length", length, attrs={"oninput": "$('#len-hooks').text(this.value)", "onchange": "$('#len-hooks').text(this.value)", "min":"6", "max":"128", "class": "w-full"}) }}
+                    </div>
+                </div>
+            </form>
+        <ul id="pass-list">
+            {% for pass in passwords %}
+                <li class="flex items-center justify-between gap-x-6 py-2">
+                    {% set id = 'pass_' ~ loop.index %}
+                    {{ input_hidden('raw_' ~ id, pass | escape)}}
+                    {{ input_text(id, pass | encrypt | escape , attrs={"readonly": true, "class": "w-full font-mono"}) }}
+                    {{ input_hidden('enc_' ~ id, pass | encrypt | escape)}}
+                    {{ secondary_button("", icon="clipboard", attrs={"onclick": "$.copy($('#raw_"+ id +"').value())"}) }}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
