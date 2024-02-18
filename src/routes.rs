@@ -304,3 +304,10 @@ async fn get_pass(query: web::Query<PasswdOption>, app: web::Data<AppState>) -> 
         },
     }
 }
+
+#[get("/ascii")]
+async fn get_ascii(app: web::Data<AppState>) -> impl Responder {
+    app.render("ascii.twig", context! {
+        nav_name => "ascii",
+    })
+}

@@ -9,7 +9,7 @@ mod consts;
 mod rest_response;
 
 use crate::embed::{get_embed_static_file, get_embed_template_file};
-use crate::routes::{get_diff, get_format, get_hash, get_pass, get_uuid, post_diff, post_format, post_hash, statics};
+use crate::routes::{get_ascii, get_diff, get_format, get_hash, get_pass, get_uuid, post_diff, post_format, post_hash, statics};
 use crate::state::AppState;
 use actix_web::{HttpResponse, web};
 use actix_web::{App, HttpServer};
@@ -104,6 +104,7 @@ async fn main() -> std::io::Result<()> {
             .service(post_hash)
             .service(get_uuid)
             .service(get_pass)
+            .service(get_ascii)
     })
     .bind((app_host, app_port))
     .unwrap()
