@@ -1,0 +1,38 @@
+{% extends "layout/base.twig" %}
+
+{% block head %}
+    <script src="/static/ast-query.js"></script>
+{% endblock %}
+
+{% from "macro/common.twig" import textarea, input_text %}
+
+{% block body %}
+
+    <div class="w-2/3 mx-auto pb-8">
+        <div class="mb-2">
+            {{ input_text("query", "", attrs={"class": "w-full", "placeholder": "selector: [type='VariableDeclaration']"}) }}
+        </div>
+        <div class="flex gap-2 h-80">
+            {{ textarea("source", "var a = 1;\nfunction test() {\n    return <div>1</div>\n}", attrs={"class": "h-full"}) }}
+            {{ textarea("output", "", attrs={"class": "h-full"}) }}
+        </div>
+        <script>
+            let source = $("#source")
+            let output = $("#output")
+            let query = $("#query")
+
+            function parse() {
+                let ast = app.acronParser(source.value());
+                let ret = app.esquery(ast, query.value() || "*")
+                output.value(JSON.stringify(ret, null, 2))
+            }
+
+            parse()
+
+            source.bind("input", parse)
+            query.bind("input", parse)
+
+        </script>
+    </div>
+
+{% endblock %}

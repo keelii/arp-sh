@@ -311,3 +311,10 @@ async fn get_ascii(app: web::Data<AppState>) -> impl Responder {
         nav_name => "ascii",
     })
 }
+
+#[get("/ast_query")]
+async fn get_ast_query(app: web::Data<AppState>) -> impl Responder {
+    app.render("ast_query.twig", context! {
+        nav_name => "ast_query",
+    })
+}
