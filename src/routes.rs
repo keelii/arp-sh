@@ -32,7 +32,7 @@ async fn statics(path: web::Path<String>) -> impl Responder {
 async fn get_hash(app: web::Data<AppState>) -> impl Responder {
     let result = hash_bytes(b"");
     app.render(
-        "hash.twig",
+        "hash-pure.twig",
         context! {
             nav_name => "hash",
             result => result,
@@ -43,6 +43,7 @@ async fn get_hash(app: web::Data<AppState>) -> impl Responder {
 #[allow(dead_code)]
 struct MultipartFormField {
     name: String,
+    file_name: String,
     bytes: Vec<u8>,
 }
 
@@ -53,6 +54,9 @@ async fn parse_multipart_form(mut form: Multipart) -> HashMap<String, MultipartF
         let mut field = item.unwrap();
         let mut bufs = Vec::new();
         let name = field.name().to_string();
+        let content_disposition = field.content_disposition();
+        let file_name = content_disposition.get_filename().unwrap_or("").to_string();
+
 
         while let Some(chunk) = field.next().await {
             let bytes = &chunk.unwrap();
@@ -61,6 +65,7 @@ async fn parse_multipart_form(mut form: Multipart) -> HashMap<String, MultipartF
 
         map.insert(name.to_string(), MultipartFormField {
             name,
+            file_name,
             bytes: bufs,
         });
     };
@@ -79,15 +84,16 @@ async fn post_hash(
 
     if files.bytes.len() > 0 {
         app.render(
-            "hash.twig",
+            "hash-pure.twig",
             context! {
+                file_name => files.file_name,
                 nav_name => "hash",
                 result => hash_bytes(&files.bytes),
             },
         )
     } else {
         app.render(
-            "hash.twig",
+            "hash-pure.twig",
             context! {
                 nav_name => "hash",
                 content => String::from_utf8_lossy(content.bytes.as_slice()).to_string(),
@@ -98,7 +104,7 @@ async fn post_hash(
 }
 #[get("/diff")]
 async fn get_diff(app: web::Data<AppState>) -> impl Responder {
-    app.render("diff.twig", context! {
+    app.render("diff-pure.twig", context! {
         nav_name => "diff",
     })
 }
@@ -126,7 +132,7 @@ async fn post_diff(
 
     match result {
         Ok(html) => app.render(
-            "diff.twig",
+            "diff-pure.twig",
             context! {
                 nav_name => "diff",
                 diff_type => form.diff_type.clone(),
@@ -137,7 +143,7 @@ async fn post_diff(
             },
         ),
         Err(err) => app.render(
-            "diff.twig",
+            "diff-pure.twig",
             context! {
                 nav_name => "diff",
                 diff_type => form.diff_type.clone(),
@@ -148,9 +154,15 @@ async fn post_diff(
         ),
     }
 }
+#[get("/ui")]
+async fn get_ui(app: web::Data<AppState>) -> impl Responder {
+    app.render("ui.twig", context! {
+        nav_name => "ui",
+    })
+}
 #[get("/format")]
 async fn get_format(app: web::Data<AppState>) -> impl Responder {
-    app.render("format.twig", context! {
+    app.render("format-pure.twig", context! {
         nav_name => "format",
     })
 }
@@ -162,7 +174,7 @@ async fn post_format(form: web::Form<FormatFormData>, app: web::Data<AppState>) 
 
     if size > SizeUnit::MB.to_bytes(2) {
         return app.render(
-            "format.twig",
+            "format-pure.twig",
             context! {
                 nav_name => "format",
                 ext => form.ext.clone(),
@@ -192,7 +204,7 @@ async fn post_format(form: web::Form<FormatFormData>, app: web::Data<AppState>) 
 
     match result {
         Ok(formatted) => app.render(
-            "format.twig",
+            "format-pure.twig",
             context! {
                 nav_name => "format",
                 ext => form.ext.clone(),
@@ -201,7 +213,7 @@ async fn post_format(form: web::Form<FormatFormData>, app: web::Data<AppState>) 
             },
         ),
         Err(err) => app.render(
-            "format.twig",
+            "format-pure.twig",
             context! {
                 nav_name => "format",
                 ext => form.ext.clone(),
@@ -230,7 +242,7 @@ async fn get_uuid(query: web::Query<UuidQuery>, app: web::Data<AppState>) -> imp
     }
     let uuids = uuid_map.iter().map(|(k, _)| k).collect::<Vec<_>>();
 
-    app.render("uuid.twig", context! {
+    app.render("uuid-pure.twig", context! {
         nav_name => "uuid",
         count => count,
         uuids => uuids,
@@ -273,7 +285,7 @@ async fn get_pass(query: web::Query<PasswdOption>, app: web::Data<AppState>) -> 
 
     match pg.generate(count) {
         Ok(passwords) => {
-            app.render("pass.twig", context! {
+            app.render("pass-pure.twig", context! {
                 nav_name => "pass",
                 passwords => passwords,
                 count => count,
@@ -289,7 +301,7 @@ async fn get_pass(query: web::Query<PasswdOption>, app: web::Data<AppState>) -> 
         Err(err) => {
             error!("generate password error: {}", err);
             let passwords : [String; 0] = [];
-            app.render("pass.twig", context! {
+            app.render("pass-pure.twig", context! {
                 nav_name => "pass",
                 passwords => passwords,
                 count => count,
@@ -307,14 +319,14 @@ async fn get_pass(query: web::Query<PasswdOption>, app: web::Data<AppState>) -> 
 
 #[get("/ascii")]
 async fn get_ascii(app: web::Data<AppState>) -> impl Responder {
-    app.render("ascii.twig", context! {
+    app.render("ascii-pure.twig", context! {
         nav_name => "ascii",
     })
 }
 
 #[get("/ast_query")]
 async fn get_ast_query(app: web::Data<AppState>) -> impl Responder {
-    app.render("ast_query.twig", context! {
+    app.render("ast_query-pure.twig", context! {
         nav_name => "ast_query",
     })
 }

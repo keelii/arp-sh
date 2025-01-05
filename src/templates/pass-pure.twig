@@ -1,0 +1,80 @@
+{% extends "layout/base-pure.twig" %}
+
+{% block head %}
+    <style>
+        #form-items label {
+            display: inline-block;
+            margin-left: 0.5em;
+        }
+    </style>
+{% endblock %}
+
+
+{% block main %}
+
+    <form method="get" class="pure-form">
+        <div class="flex items-center gap-1 mb-2">
+            {{ input_number("count", count, attrs={"min": "1", "max": "500", "placeholder": "Max 500", "class": "w-full lg"}) }}
+            {{ primary_button("Generate", attrs={"type": "submit"}) }}
+            <div id="toggle-btn">
+                {{ secondary_button("Toggle Visible", attrs={"class": "hidden", "type": "button"}) }}
+                {{ secondary_button("Toggle Visible", attrs={"type": "button"}) }}
+                <script>
+                    $('#toggle-btn button').bind("click", function(e) {
+                        $(this).addClass("hidden");
+                        if ($(this).prev()) {
+                            $(this).prev().removeClass("hidden")
+                            showPasswords()
+                        } else {
+                            $(this).next().removeClass("hidden")
+                            hidePasswords()
+                        }
+                    });
+                    function showPasswords() {
+                        $("#pass-list input[type='text']").each(function(i, el) {
+                            $(el).value($(el).prev().value())
+                        })
+                    }
+                    function hidePasswords() {
+                        $("#pass-list input[type='text']").each(function(i, el) {
+                            $(el).value($(el).next().value())
+                        })
+                    }
+                </script>
+            </div>
+        </div>
+        <div id="form-items" class="flex justify-between mb-2 p-2 success">
+            <div class="pure-g w-full">
+                <div class="pure-u-3-5">
+                    <div class="pure-g mb-1">
+                        <div class="pure-u-1-3">{{ checkbox_field("numbers", "Numbers", true) }}</div>
+                        <div class="pure-u-1-3">{{ checkbox_field("lowercase", "Lowercase", true) }}</div>
+                        <div class="pure-u-1-3">{{ checkbox_field("uppercase", "Uppercase", true) }}</div>
+                    </div>
+                    <div class="pure-g">
+                        <div class="pure-u-1-3">{{ checkbox_field("symbols", "Symbols", true) }}</div>
+                        <div class="pure-u-1-3">{{ checkbox_field("spaces", "Spaces", false) }}</div>
+                        <div class="pure-u-1-3">{{ checkbox_field("no_similar", "No Similar", false) }}</div>
+                    </div>
+                </div>
+                <div class="pure-u-2-5">
+                    <div class="grow">
+                        <label for="length">Password Length(<strong id="len-hooks">{{ length }}</strong>)</label>
+                        {{ input_range("length", length, attrs={"oninput": "$('#len-hooks').text(this.value)", "onchange": "$('#len-hooks').text(this.value)", "min":"6", "max":"128", "class": "w-full"}) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <ul id="pass-list" class="space-y-1" style="padding: 0;">
+            {% for pass in passwords %}
+                <li class="flex justify-between gap-1">
+                    {% set id = 'pass_' ~ loop.index %}
+                    {{ input_hidden('raw_' ~ id, pass | escape)}}
+                    {{ input_text(id, pass | encrypt | escape , attrs={"readonly": true, "class": "w-full font-mono lg"}) }}
+                    {{ input_hidden('enc_' ~ id, pass | encrypt | escape)}}
+                    {{ secondary_button("Copy", attrs={"class": "sm", "onclick": "$.copy($('#raw_"+ id +"').value())"}) }}
+                </li>
+            {% endfor %}
+        </ul>
+    </form>
+{% endblock %}

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>arp.sh</title>
+
+    <link rel="stylesheet" href="/static/pure-min.css" />
+    <script src="/static/main.js"></script>
+    {% block head %}{% endblock %}
+    <style>
+        /*textarea.lg,*/
+        /*input[type="text"].lg,*/
+        /*input[type="number"].lg {*/
+        /*    padding: 0.4em;*/
+        /*}*/
+        /*textarea.xl,*/
+        /*input[type="text"].xl,*/
+        /*input[type="number"].xl {*/
+        /*    padding: 0.5em;*/
+        /*}*/
+        input[type=checkbox],
+        input[type=radio] {
+            transform: scale(1.5);
+        }
+        textarea {
+            box-sizing: border-box;
+            max-width: 100%;
+        }
+        label {
+            user-select: none;
+        }
+
+        .xs { font-size: 70%; }
+        .sm { font-size: 85%; }
+        .lg { font-size: 110%; }
+        .xl { font-size: 125%; }
+
+        .success, .danger, .warn, .info {
+            color: white;
+            border-radius: 2px;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        }
+
+        .success { background: rgba(28, 184, 65, 0.8); }
+        .danger { background: rgba(202, 60, 60, 0.8); }
+        .warn { background: rgba(223, 117, 20, 0.8); }
+        .info { background: rgba(66, 184, 221, 0.8); }
+        .alert { padding: 0.5em 1em; }
+        .flex {
+            display: flex;
+            align-items: center;
+        }
+        .justify-between { justify-content: space-between; }
+        .inline-flex { display: inline-flex; align-items: center; }
+        .grow { flex-grow: 1; }
+        .gap-1 { gap: 1em; }
+        .gap-2 { gap: 2em; }
+        .whitespace-nowrap { white-space: nowrap; }
+        .mb-1 { margin-bottom: 1em; }
+        .mb-2 { margin-bottom: 2em; }
+        .ml-2 { margin-left: 2em; }
+        .mr-2 { margin-right: 2em; }
+        .p-1 { padding: 1em; }
+        .p-2 { padding: 2em; }
+        .py-1 { padding-top: 1em; padding-bottom: 1em; }
+        .py-2 { padding-top: 2em; padding-bottom: 2em; }
+        .space-y-1 > * {
+            margin-bottom: 1em;
+        }
+        .space-y-1 > *:last-child {
+            margin-bottom: 0;
+        }
+        .absolute { position: absolute; }
+        .relative { position: relative; }
+        .opacity-0 { opacity: 0; }
+        .w-full {
+            width: 100%;
+        }
+        .font-mono {
+            font-family: monospace;
+        }
+
+        .pure-menu-selected .pure-menu-link {
+            background: #eee;
+        }
+        .w {
+            max-width: 80em;
+            margin: 0 auto;
+        }
+        header {
+            padding: 1em 0;
+            box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px;
+        }
+    </style>
+</head>
+<body class="body">
+{% from "macro/common-pure.twig" import
+    primary_button, secondary_button, secondary_link, textarea,
+    input_text, input_file, input_number, input_hidden, input_range,
+    checkbox_field, radio_field
+%}
+
+<header class="mb-2">
+    <div class="w">
+        {% include 'include/nav-pure.twig' %}
+    </div>
+</header>
+
+<main>
+    <div class="w">
+        {% include 'include/error-pure.twig' %}
+    </div>
+    <div class="w">
+        {% block main %}{% endblock %}
+    </div>
+</main>
+</body>
+</html>

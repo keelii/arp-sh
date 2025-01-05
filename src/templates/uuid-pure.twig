@@ -1,0 +1,35 @@
+{% extends "layout/base-pure.twig" %}
+
+
+{% block main %}
+
+    <div class="w-1/2 mx-auto">
+        <form method="get" class="pure-form">
+            <div class="flex gap-2 mb-2">
+                {{ input_number("count", count, attrs={"min": "1", "max": "1000", "placeholder": "Max 1000", "class": "w-full font-mono xl"}) }}
+                <span class="whitespace-nowrap">1 ~ 1000</span>
+                {{ primary_button("Generate", attrs={"type": "submit"}) }}
+            </div>
+            <div class="mb-2">
+                {{ textarea("uuids", uuids | join("\n"), attrs={"readonly": true, "class": "mb-1 w-full font-mono xl", "rows": 5}) }}
+                <div class="flex gap-1">
+                    {{ secondary_button("Copy All UUIDs to Clipboard", attrs={"class": "justify-center grow", "onclick": "$.copy($('#uuids').value())"}) }}
+                    {{ secondary_link("Download as file", attrs={
+                        "href": "data:text/plain;charset=utf-8," ~ uuids | join("%0A"),
+                        "download": "uuids.txt",
+                        "class": "justify-center grow"
+                    }) }}
+                </div>
+            </div>
+            <ul class="space-y-1" style="padding: 0;">
+                {% for uuid in uuids %}
+                    <li class="flex items-center justify-between gap-1">
+                        {% set id = 'uuid_' ~ loop.index %}
+                        {{ input_text(id, uuid, attrs={"readonly": true, "class": "lg w-full font-mono"}) }}
+                        {{ secondary_button("Copy", attrs={"class": "sm", "onclick": "$.copy($('#"+ id +"').value())"}) }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </form>
+    </div>
+{% endblock %}

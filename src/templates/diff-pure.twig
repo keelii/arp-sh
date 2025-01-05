@@ -1,0 +1,33 @@
+{% extends "layout/base-pure.twig" %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="/static/diff2html.min.css" />
+{% endblock %}
+
+{% block main %}
+
+    <form class="pure-form" method="post">
+        <div class="flex gap-1 mb-1">
+            {{ primary_button("Diff", attrs={"type": "submit"}) }}
+            <div class="flex gap-1">
+                {{ radio_field("diff_type", "lines", "Lines", diff_type | default("lines")) }}
+                {{ radio_field("diff_type", "words", "Words", diff_type) }}
+                {{ radio_field("diff_type", "chars", "Chars", diff_type) }}
+            </div>
+        </div>
+        <div id="diff-text" class="mb-1 flex gap-1">
+            {{ textarea("left", left, attrs={"class": "w-full", "placeholder": "Left text", "rows": 10, "autofocus": true}) }}
+            {{ textarea("right", right, attrs={"class": "w-full", "placeholder": "Right text", "rows": 10}) }}
+        </div>
+        <div id="unified-diff-text" class="mb-1">
+            {{ textarea("unified", unified, attrs={"class": "w-full", "placeholder": "Or put unified diff string here...", "rows": 2}) }}
+        </div>
+        <div>
+            {% if result is defined %}
+                {{ result | safe }}
+            {% else %}
+            {% endif %}
+        </div>
+    </form>
+
+{% endblock %}

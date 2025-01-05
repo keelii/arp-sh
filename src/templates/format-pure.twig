@@ -1,0 +1,44 @@
+{% extends "layout/base-pure.twig" %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="/static/diff2html.min.css" />
+{% endblock %}
+
+{% block main %}
+
+    <form class="pure-form" method="post">
+        <div class="flex gap-1 mb-1">
+            {{ primary_button("Format", attrs={"type": "submit"}) }}
+            <div class="pure-button-group" role="group">
+                {% set exts = [
+                    {"key": "ts", "value": "TypeScript", "selected": true},
+                    {"key": "js", "value": "JavaScript"},
+                    {"key": "json", "value": "JSON"},
+                    {"key": "html", "value": "HTML"},
+                    {"key": "md", "value": "Markdown"},
+                    {"key": "css", "value": "CSS"},
+                    {"key": "nginx", "value": "Nginx"},
+                ] %}
+                <select name="ext" class="pure-button" id="ext" style="display: none;">
+                    {% for e in exts %}
+                        <option value="{{ e.key }}" {% if e.selected %}selected{% endif %}>{{ e.value }}</option>
+                    {% endfor %}
+                </select>
+                {% set active = "pure-button-active" %}
+                {% for e in exts %}
+                    <button type="button" class="pure-button info {% if e.key == ext or e.selected %}{{ active }}{% endif %}" onclick="do_check(this, '{{ e.key }}')">{{ e.value }}</button>
+                {% endfor %}
+                <script>
+                  function do_check(el, key) {
+                    $(el).parent().children().removeClass("{{ active }}")
+                    $(el).addClass("{{ active }}")
+                    $("#ext").value(key)
+                  }
+                </script>
+            </div>
+            {{ checkbox_field("indent2", "Indent with 2 spaces", indent2) }}
+        </div>
+        {{ textarea("content", content, attrs={"placeholder": "code here...", "class": "pure-input-1", "rows": 30}) }}
+    </form>
+
+{% endblock %}

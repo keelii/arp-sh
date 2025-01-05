@@ -1,0 +1,123 @@
+{% extends "layout/base-pure.twig" %}
+
+
+{% block head %}
+    <style>
+        #files {
+            left: 0; top: 0;
+            width: 100px; height: 100px;
+        }
+        table td {
+            padding: 0.5em;
+        }
+        table td input,
+        table td textarea {
+            font-family: monospace;
+        }
+    </style>
+{% endblock %}
+
+
+{% block main %}
+
+    <form method="post" enctype="multipart/form-data" class="pure-form mb-1">
+        <div class="mb-4 flex gap-1">
+            {{ textarea("content", content, attrs=
+                {
+                    "rows": "1",
+                    "class": "w-full lg",
+                    "autofocus": true,
+                    "placeholder": ("Hash Result: " ~ file_name) if file_name is defined else "Hash string here..."
+                }
+            ) }}
+            {{ primary_button("Calculate", attrs={"type": "submit" }) }}
+            {{ secondary_button("Upload", attrs={"class": "relative"}, child=input_file("files", attrs={"class": "w-20 h-20 absolute opacity-0"})) }}
+        </div>
+    </form>
+
+    {% if result is defined %}
+    <table class="w-full pure-table pure-table-horizontal pure-form">
+        <thead>
+        <tr class="bg-gray-100">
+            <th>Method</th>
+            <th>Result</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><abbr title="Message-digest algorithm">MD5</abbr></td>
+            <td>{{ input_text("", result.md5, attrs={"class":"w-full", "readonly": true}) }}</td>
+        </tr>
+        <tr>
+            <td><abbr title="Cyclic redundancy check">CRC</abbr></td>
+            <td>
+                <table class="w-full">
+                    <colgroup>
+                        <col width="15%" />
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Integer</th>
+                        <th>Hex</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>CRC16(arc)</td>
+                        <td>{{ input_text("", result.crc16.int, attrs={"class":"w-full", "readonly": true}) }}</td>
+                        <td>{{ input_text("", result.crc16.hex, attrs={"class":"w-full", "readonly": true}) }}</td>
+                    </tr>
+                    <tr>
+                        <td>CRC32(ISO)</td>
+                        <td>{{ input_text("", result.crc32.int, attrs={"class":"w-full", "readonly": true}) }}</td>
+                        <td>{{ input_text("", result.crc32.hex, attrs={"class":"w-full", "readonly": true}) }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td><abbr title="Secure hash algorithms">SHA</abbr></td>
+            <td>
+                <table class="w-full">
+                    <colgroup>
+                        <col width="15%" />
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Hex</th>
+                        <th>Base64</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>SHA1</td>
+                        <td>{{ input_text("", result.sha1.hex, attrs={"class":"w-full", "readonly": true}) }}</td>
+                        <td>{{ input_text("", result.sha1.b64, attrs={"class":"w-full", "readonly": true}) }}</td>
+                    </tr>
+                    <tr>
+                        <td>SHA256</td>
+                        <td>{{ textarea("", result.sha256.hex, attrs={"class":"w-full", "readonly": true}) }}</td>
+                        <td>{{ textarea("", result.sha256.b64, attrs={"class":"w-full", "readonly": true}) }}</td>
+                    </tr>
+                    <tr>
+                        <td>SHA384</td>
+                        <td>{{ textarea("", result.sha384.hex, attrs={"class":"w-full", "readonly": true}) }}</td>
+                        <td>{{ textarea("", result.sha384.b64, attrs={"class":"w-full", "readonly": true}) }}</td>
+                    </tr>
+                    <tr>
+                        <td>SHA512</td>
+                        <td>{{ textarea("", result.sha512.hex, attrs={"rows": 3, "class":"w-full", "readonly": true}) }}</td>
+                        <td>{{ textarea("", result.sha512.b64, attrs={"rows": 3, "class":"w-full", "readonly": true}) }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    {% endif %}
+
+{% endblock %}

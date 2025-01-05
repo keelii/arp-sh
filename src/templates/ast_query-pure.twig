@@ -1,0 +1,40 @@
+{% extends "layout/base-pure.twig" %}
+
+{% block head %}
+    <script src="/static/ast-query.js"></script>
+{% endblock %}
+
+{% block main %}
+
+    <div class="w-2/3 mx-auto pb-8 pure-form">
+        <div class="mb-1">
+            {{ input_text("query", "", attrs={"class": "w-full font-mono xl", "placeholder": "selector: [type='VariableDeclaration']"}) }}
+        </div>
+        <div class="pure-g">
+            <div class="pure-u-1-2">
+                {{ textarea("source", "var a = 1;\nfunction test() {\n    return <div>1</div>\n}", attrs={"rows": 30, "class": "w-full font-mono"}) }}
+            </div>
+            <div class="pure-u-1-2">
+                {{ textarea("output", "", attrs={"rows": 30, "class": "w-full font-mono"}) }}
+            </div>
+        </div>
+        <script>
+            let source = $("#source")
+            let output = $("#output")
+            let query = $("#query")
+
+            function parse() {
+                let ast = app.acronParser(source.value());
+                let ret = app.esquery(ast, query.value() || "*")
+                output.value(JSON.stringify(ret, null, 2))
+            }
+
+            parse()
+
+            source.bind("input", parse)
+            query.bind("input", parse)
+
+        </script>
+    </div>
+
+{% endblock %}

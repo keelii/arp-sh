@@ -9,7 +9,7 @@ mod consts;
 mod rest_response;
 
 use crate::embed::{get_embed_static_file, get_embed_template_file};
-use crate::routes::{get_ascii, get_ast_query, get_diff, get_format, get_hash, get_pass, get_uuid, post_diff, post_format, post_hash, statics};
+use crate::routes::{get_ascii, get_ast_query, get_diff, get_format, get_hash, get_pass, get_ui, get_uuid, post_diff, post_format, post_hash, statics};
 use crate::state::AppState;
 use actix_web::{HttpResponse, web};
 use actix_web::{App, HttpServer};
@@ -46,8 +46,8 @@ fn init_js_rt() -> Context {
 
 fn encrypt_filter(value: String) -> String {
     let len = value.chars().count();
-    let stars = "*".repeat(len - 4);
-    return format!("{}{}{}", &value[0..2], stars, &value[len - 2..])
+    let stars = "*".repeat(len - 2);
+    return format!("{}{}{}", &value[0..1], stars, &value[len - 1..])
 }
 #[allow(unused_variables)]
 fn init_template<'source>(dir: &Path) -> Environment<'source> {
@@ -97,6 +97,7 @@ async fn main() -> std::io::Result<()> {
             .service(statics)
             .service(web::redirect("/", "/format"))
             .service(get_format)
+            .service(get_ui)
             .service(post_format)
             .service(get_diff)
             .service(post_diff)

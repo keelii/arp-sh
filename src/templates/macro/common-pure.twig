@@ -1,0 +1,57 @@
+{%- macro map_attrs(attrs={}, excludes=[]) %}
+    {%- for k, v in attrs | items %}
+        {%- if k not in excludes %}
+            {%- if not loop.first %} {% endif %} {% if v == true or v == false %}{{ k }}{% else %}{{ k }}="{{ v }}"{% endif %}
+        {%- endif %}
+    {%- endfor %}
+{%- endmacro %}
+
+{% macro map_attrs_with_class(clazz, attrs={}, excludes=[]) -%}
+    class="{{ clazz }} {{ attrs['class'] | default('') }}" {{ map_attrs(attrs, excludes=["class"]) }}
+{%- endmacro %}
+
+
+{% macro primary_button(label, attrs={}, child="") %}
+<button {% if not attrs["type"] %} type="button"{% endif %} {{ map_attrs_with_class("pure-button pure-button-primary", attrs) }}>{{ label }}{{ child }}</button>
+{% endmacro %}
+{% macro secondary_button(label, attrs={}, child="") %}
+<button {% if not attrs["type"] %} type="button"{% endif %} {{ map_attrs_with_class("pure-button info", attrs) }}>{{ label }}{{ child }}</button>
+{% endmacro %}
+{% macro secondary_link(label, attrs={}, child="") %}
+<a href="{{ attrs['href'] }}" {{ map_attrs_with_class("pure-button info", attrs) }}>{{ label }}{{ child }}</a>
+{% endmacro %}
+
+
+
+{% macro input_base(type, id, value="", input_base_class="", attrs={}) %}
+    <input type="{{ type }}" value="{{ value }}" name="{{ id }}" id="{{ id }}" {{ map_attrs_with_class(input_base_class, attrs) }} />
+{% endmacro %}
+{% macro input_text(id, value="", attrs={}) %}
+    {{ input_base("text", id, value, input_base_class, attrs) }}
+{% endmacro %}
+{% macro input_number(id, value="", attrs={}) %}
+    {{ input_base("number", id, value, input_base_class, attrs) }}
+{% endmacro %}
+{% macro input_file(id, attrs={}) %}
+    {{ input_base("file", id, "", "", attrs) }}
+{% endmacro %}
+{% macro input_hidden(id, value, attrs={}) %}
+    {{ input_base("hidden", id, value, "", attrs) }}
+{% endmacro %}
+{% macro input_range(id, value="", attrs={}) %}
+    {{ input_base("range", id, value, "", attrs) }}
+{% endmacro %}
+
+{% macro textarea(id, value="", attrs={}) %}
+    <textarea name="{{ id }}" id="{{ id }}" {{ map_attrs_with_class("", attrs) }}>{{ value | escape }}</textarea>
+{% endmacro %}
+
+{% macro checkbox_field(id, label, checked) %}
+<input id="{{ id }}" name="{{ id }}" {% if checked is true %}checked{% endif %} type="checkbox" />
+<label for="{{ id }}" class="pure-checkbox">{{ label }}</label>
+{% endmacro %}
+
+{% macro radio_field(name, id, label, checkedValue) %}
+<input id="{{ id }}" name="{{ name }}" value="{{ id }}" {% if checkedValue == id %}checked{% endif %} type="radio" />
+<label for="{{ id }}" class="pure-radio">{{ label }}</label>
+{% endmacro %}
