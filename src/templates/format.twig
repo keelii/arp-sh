@@ -6,7 +6,7 @@
     {% include 'include/error.twig' %}
 
     <form method="post">
-        <div class="mb-4 flex">
+        <div class="flex">
             <span class="mr-2">{{ primary_button("Format", size="lg", icon="ok", attrs={ "type": "submit" }) }}</span>
             <span class="mr-4">{{ secondary_button("Copy", size="lg", icon="clipboard", attrs={"onclick": "$.copy($('#content').value())"}) }}</span>
             <span class="mr-4 group-btn">

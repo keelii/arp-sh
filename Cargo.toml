@@ -33,6 +33,6 @@ crc = "3.0.1"
 base64 = "0.22.0"
 rust-embed = "8.2.0"
 mime_guess = "2.0.4"
-actix-multipart = "0.6.1"
+actix-multipart = "0.7.2"
 uuid = {version = "1.7.0", features = ["v4"]}
 passwords = "3.1.16"

@@ -53,10 +53,9 @@ async fn parse_multipart_form(mut form: Multipart) -> HashMap<String, MultipartF
     while let Some(item) = form.next().await {
         let mut field = item.unwrap();
         let mut bufs = Vec::new();
-        let name = field.name().to_string();
-        let content_disposition = field.content_disposition();
-        let file_name = content_disposition.get_filename().unwrap_or("").to_string();
-
+        let name = field.name().unwrap().to_string();
+        let sd = field.content_disposition().unwrap();
+        let file_name = sd.get_filename().unwrap_or("").to_string();
 
         while let Some(chunk) = field.next().await {
             let bytes = &chunk.unwrap();
