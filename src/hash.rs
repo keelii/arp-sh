@@ -7,6 +7,7 @@ use sha1::Sha1;
 use sha2::Sha256;
 use sha3::{Sha3_384, Sha3_512};
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct HashFormData {
     pub content: String,
