@@ -22,9 +22,9 @@ jobs:
     needs: create-release
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-22.04]
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
 #            features: bundled
     runs-on: ${{ matrix.os }}
     steps:
