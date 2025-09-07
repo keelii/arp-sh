@@ -1,3 +1,4 @@
+use actix_web::head;
 use std::cmp;
 use std::collections::{HashMap};
 use actix_multipart::Multipart;
@@ -159,6 +160,18 @@ async fn get_ui(app: web::Data<AppState>) -> impl Responder {
         nav_name => "ui",
     })
 }
+
+#[get("/")]
+async fn get_home() -> impl Responder {
+    HttpResponse::Found()
+        .append_header(("Location", "/format"))
+        .finish()
+}
+#[head("/")]
+async fn head_home() -> impl Responder {
+    HttpResponse::Ok().finish()
+}
+
 #[get("/format")]
 async fn get_format(app: web::Data<AppState>) -> impl Responder {
     app.render("format-pure.twig", context! {
